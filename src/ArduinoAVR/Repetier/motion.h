@@ -481,6 +481,9 @@ public:
     inline static void resetPathPlanner() {
         linesCount = 0;
         linesPos = linesWritePos;
+#if RTOS_ENABLE
+        RTOS::notify(RTOS::NOTIFY_PRINTLINES_FREED);
+#endif
         Printer::setMenuMode(MENU_MODE_PRINTING, Printer::isPrinting());
     }
     // Only called from bresenham -> inside interrupt handle
@@ -645,9 +648,13 @@ public:
 #endif
         HAL::forbidInterrupts();
         --linesCount;
+#if RTOS_ENABLE
+        RTOS::notify(RTOS::NOTIFY_PRINTLINES_FREED);
+#endif
         if(!linesCount)
             Printer::setMenuMode(MENU_MODE_PRINTING, Printer::isPrinting());
     }
+
     static INLINE void pushLine() {
         nextPlannerIndex(linesWritePos);
         Printer::setMenuMode(MENU_MODE_PRINTING, true);

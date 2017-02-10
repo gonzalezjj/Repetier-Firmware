@@ -1970,6 +1970,21 @@ If you have leveling with bed coating or fixed z min you can use this menu to ad
 #define MOTOR_DRIVER_1(var) StepperDriver<E1_STEP_PIN, E1_DIR_PIN, E1_ENABLE_PIN, false, false> var(float stepsPerMM,float speed,float maxXPos)
 
 /*
+ * A real-time operating system allows separating the UI code from the printer
+ * control code, improving the performance of the printer by reducing latency.
+ * However, it also slightly increases the code size, so make sure your MCU has 
+ * enough free flash.
+ * 
+ * Values:
+ *  0: No RTOS
+ *  1: FreeRTOS (Requires the Repetier_FreeRTOS arduino library to be installed on your PC)
+ */
+#define RTOS_ENABLE 1
+
+// Time the main thread should sleep if it's got nothing to do
+#define RTOS_MAIN_THREAD_SLEEP_MS 50
+
+/*
   You can expand firmware functionality with events and you own event handler.
   Read Events.h for more informations. To activate, uncomment the following define.
 */

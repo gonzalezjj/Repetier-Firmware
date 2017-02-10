@@ -587,6 +587,7 @@ const UIMenu name PROGMEM = {5,action,5,name ## _entries};
 class GCode;
 class UIDisplay {
   public:
+    millis_t lastAnimationToggle;
     volatile uint8_t flags; // 1 = fast key action, 2 = slow key action, 4 = slow action running, 8 = key test running
     uint8_t col; // current col for buffer pre fill
     uint8_t menuLevel; // current menu level, 0 = info, 1 = group, 2 = groupdata select, 3 = value change
@@ -666,10 +667,12 @@ class UIDisplay {
 #endif
     char cwd[SD_MAX_FOLDER_DEPTH * LONG_FILENAME_LENGTH + 2];
     uint8_t folderLevel;
+
+#if RTOS_ENABLE
+    void UILoop();
+#endif
 };
 extern UIDisplay uid;
-
-
 
 #endif
 

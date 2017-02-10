@@ -595,6 +595,11 @@ inline void memcopy4(void *dest,void *source) {
 #endif
 
 #include "HAL.h"
+
+#if RTOS_ENABLE
+#include "RTOS.h"
+#endif // RTOS_ENABLE
+
 #define MAX_VFAT_ENTRIES (2)
 /** Total size of the buffer used to store the long filenames */
 #define LONG_FILENAME_LENGTH (13*MAX_VFAT_ENTRIES+1)

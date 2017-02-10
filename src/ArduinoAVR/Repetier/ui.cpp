@@ -982,6 +982,7 @@ void UIDisplay::initialize() {
 #endif
     flags = 0;
     menuLevel = 0;
+    lastAnimationToggle = HAL::timeInMilliseconds();
     shift = -2;
     menuPos[0] = 0;
     lastAction = 0;
@@ -993,6 +994,7 @@ void UIDisplay::initialize() {
     cwd[0] = '/';
     cwd[1] = 0;
     folderLevel = 0;
+
     UI_STATUS_F(Com::translatedF(UI_TEXT_PRINTER_READY_ID));
 #if UI_DISPLAY_TYPE != NO_DISPLAY
     initializeLCD();
@@ -1863,6 +1865,7 @@ void UIDisplay::showLanguageSelectionWizard() {
 void UIDisplay::setStatusP(PGM_P txt, bool error) {
     if(!error && Printer::isUIErrorMessage()) return;
     uint8_t i = 0;
+    InterruptProtectedBlock ipb;
     while(i < 20) {
         uint8_t c = pgm_read_byte(txt++);
         if(!c) break;
@@ -1876,6 +1879,7 @@ void UIDisplay::setStatusP(PGM_P txt, bool error) {
 void UIDisplay::setStatus(const char *txt, bool error) {
     if(!error && Printer::isUIErrorMessage()) return;
     uint8_t i = 0;
+    InterruptProtectedBlock ipb;
     while(*txt && i < 20)
         statusMsg[i++] = *txt++;
     statusMsg[i] = 0;
@@ -2371,12 +2375,23 @@ void UIDisplay::refreshPage() {
     } while( u8g_NextPage(&u8g) ); //end picture loop
 #endif
 #endif
-    Printer::toggleAnimation();
+    millis_t currentTime = HAL::timeInMilliseconds();
+    if (currentTime > lastAnimationToggle + 350) {
+        lastAnimationToggle = currentTime;
+        Printer::toggleAnimation();
+    }
 }
+
+#if RTOS_ENABLE
+void UIDisplay::UILoop() {
+    RTOS::wait(RTOS_UI_THREAD_SLEEP_MS);
+    uid.refreshPage();
+}
+#endif
 
 void UIDisplay::pushMenu(const UIMenu *men, bool refresh) {
     if(men == menu[menuLevel]) {
-        refreshPage();
+        UI_REFRESH;
         return;
     }
     if(menuLevel + 1 >= UI_MENU_MAXLEVEL) return; // Max. depth reached. No more memory to down further.
@@ -2408,14 +2423,14 @@ void UIDisplay::pushMenu(const UIMenu *men, bool refresh) {
         menuPos[menuLevel] = entAction == UI_ACTION_BACK ? 1 : 0; // if top entry is back, default to next useful item
     }
     if(refresh)
-        refreshPage();
+        UI_REFRESH;
 }
 void UIDisplay::popMenu(bool refresh) {
     if(menuLevel > 0) menuLevel--;
     Printer::setAutomount(false);
     activeAction = 0;
     if(refresh)
-        refreshPage();
+        UI_REFRESH;
 }
 
 void UIDisplay::showMessage(int id) {
@@ -2474,7 +2489,7 @@ int UIDisplay::okAction(bool allowMoves) {
             goDir(filename);
             menuTop[menuLevel] = 0;
             menuPos[menuLevel] = 1;
-            refreshPage();
+            UI_REFRESH;
             oldMenuLevel = -1;
             return 0;
         }
@@ -2697,10 +2712,12 @@ bool UIDisplay::nextPreviousAction(int16_t next, bool allowMoves) {
         Printer::setUIErrorMessage(false);
         // return true;
     }
+
     millis_t actTime = HAL::timeInMilliseconds();
     millis_t dtReal;
     millis_t dt = dtReal = actTime - lastNextPrev;
     lastNextPrev = actTime;
+
     if(dt < SPEED_MAX_MILLIS) dt = SPEED_MAX_MILLIS;
     if(dt > SPEED_MIN_MILLIS) {
         dt = SPEED_MIN_MILLIS;
@@ -2708,6 +2725,7 @@ bool UIDisplay::nextPreviousAction(int16_t next, bool allowMoves) {
     }
     float f = (float)(SPEED_MIN_MILLIS - dt) / (float)(SPEED_MIN_MILLIS - SPEED_MAX_MILLIS);
     lastNextAccumul = 1.0f + (float)SPEED_MAGNIFICATION * f * f;
+
 #if UI_DYNAMIC_ENCODER_SPEED
     int16_t dynSp = lastNextAccumul / 16;
     if(dynSp < 1)  dynSp = 1;
@@ -3898,7 +3916,7 @@ int UIDisplay::executeAction(unsigned int action, bool allowMoves) {
             EVENT_UI_EXECUTE(action, allowMoves);
             break;
         }
-    refreshPage();
+    UI_REFRESH;
 #if UI_AUTORETURN_TO_MENU_AFTER!=0
     ui_autoreturn_time = HAL::timeInMilliseconds() + UI_AUTORETURN_TO_MENU_AFTER;
 #endif
@@ -4051,7 +4069,7 @@ void UIDisplay::slowAction(bool allowMoves) {
         } else
             shift = -2;
 
-        refreshPage();
+        UI_REFRESH;
         lastRefresh = time;
     }
 }

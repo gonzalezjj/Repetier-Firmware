@@ -771,7 +771,7 @@ void Printer::waitForZProbeStart() {
     if(Endstops::zProbe()) return;
 #if UI_DISPLAY_TYPE != NO_DISPLAY
     uid.setStatusP(Com::tHitZProbe);
-    uid.refreshPage();
+    UI_REFRESH;
 #endif
 #ifdef DEBUG_PRINT
     debugWaitLoop = 3;

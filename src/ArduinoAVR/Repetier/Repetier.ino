@@ -1,3 +1,4 @@
+
 /*
     This file is part of Repetier-Firmware.
 
@@ -191,16 +192,17 @@ Custom M Codes
 void setup()
 {
     Printer::setup();
+#if RTOS_ENABLE
+    RTOS::setupTasks();
+#endif
 }
 
 void loop()
 {
+#if RTOS_ENABLE == 0
     Commands::commandLoop();
+#endif
 }
-
-
-
-
 
 
 

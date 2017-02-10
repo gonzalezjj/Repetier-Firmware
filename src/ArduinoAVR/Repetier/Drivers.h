@@ -1,6 +1,7 @@
 #ifndef DRIVERS_H_INCLUDED
 #define DRIVERS_H_INCLUDED
 
+
 /**
 For some special printers you need to control extra motors. Possible reasons are
 - Extruder switches
@@ -81,6 +82,9 @@ public:
             HAL::pingWatchdog();
             if((target & 127) == 0) {
                 Commands::checkForPeriodicalActions(false);
+#if RTOS_ENABLE
+                RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
 				GCode::keepAlive(Processing);
 			}
         }

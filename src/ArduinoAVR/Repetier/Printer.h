@@ -246,6 +246,7 @@ Step 2: Convert to RWC
 */
 class Printer {
     static uint8_t debugLevel;
+
 public:
 #if USE_ADVANCE || defined(DOXYGEN)
     static volatile int extruderStepsNeeded; ///< This many extruder steps are still needed, <0 = reverse steps needed.
@@ -434,11 +435,16 @@ public:
     static void handleInterruptEvent();
 
     static INLINE void setInterruptEvent(uint8_t evt, bool highPriority) {
-        if(highPriority || interruptEvent == 0)
+        if(highPriority || interruptEvent == 0) {
             interruptEvent = evt;
+#if RTOS_ENABLE
+            RTOS::notify(RTOS::NOTIFY_PERIODIC_ACTION_REQUIRED);
+#endif
+        }
     }
     static void reportPrinterMode();
     static INLINE void setMenuMode(uint16_t mode, bool on) {
+        InterruptProtectedBlock ipb;
         if(on)
             menuMode |= mode;
         else

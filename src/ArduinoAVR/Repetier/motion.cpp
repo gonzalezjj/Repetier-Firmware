@@ -1157,6 +1157,9 @@ void PrintLine::logLine() {
 void PrintLine::waitForXFreeLines(uint8_t b, bool allowMoves) {
     while(getLinesCount() + b > PRINTLINE_CACHE_SIZE) { // wait for a free entry in movement cache
         //GCode::readFromSerial();
+#if RTOS_ENABLE
+        RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
         Commands::checkForPeriodicalActions(allowMoves);
     }
 }

@@ -1,3 +1,4 @@
+
 /*
 This file is part of Repetier-Firmware.
 
@@ -48,10 +49,18 @@ void Commands::commandLoop() {
             } else
 #endif
                 Commands::executeGCode(code);
+
             code->popCurrentCommand();
+#if RTOS_ENABLE
+        } else {
+            RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
         }
     } else {
         GCode::keepAlive(Paused);
+#if RTOS_ENABLE
+        RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
         UI_MEDIUM;
     }
     Printer::defaultLoopActions();
@@ -99,6 +108,9 @@ void Commands::waitUntilEndOfAllMoves() {
         //GCode::readFromSerial();
         checkForPeriodicalActions(false);
         GCode::keepAlive(Processing);
+#if RTOS_ENABLE
+        RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
         UI_MEDIUM;
     }
 }
@@ -126,6 +138,8 @@ void Commands::waitUntilEndOfAllBuffers() {
 #endif
                 Commands::executeGCode(code);
             code->popCurrentCommand();
+        } else {
+            RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
         }
         Commands::checkForPeriodicalActions(false); // only called from memory
         UI_MEDIUM;
@@ -1094,6 +1108,9 @@ void Commands::processGCode(GCode *com) {
         codenum += HAL::timeInMilliseconds();  // keep track of when we started waiting
         while((uint32_t)(codenum - HAL::timeInMilliseconds())  < 2000000000 ) {
             GCode::keepAlive(Processing);
+#if RTOS_ENABLE
+            RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
             Commands::checkForPeriodicalActions(true);
         }
         break;
@@ -2217,6 +2234,9 @@ void Commands::processMCode(GCode *com) {
             }
             do {
                 Commands::checkForPeriodicalActions(true);
+#if RTOS_ENABLE
+                RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
                 GCode::keepAlive(WaitHeater);
             } while(HAL::digitalRead(com->P) != comp);
         }
@@ -2942,6 +2962,8 @@ void Commands::emergencyStop() {
 #endif
 }
 
+#if RTOS_ENABLE == 0
+
 void Commands::checkFreeMemory() {
     int newfree = HAL::getFreeRam();
     if(newfree < lowestRAMValue)
@@ -2954,3 +2976,8 @@ void Commands::writeLowestFreeRAM() {
         Com::printFLN(Com::tFreeRAM, lowestRAMValue);
     }
 }
+
+#else
+void Commands::checkFreeMemory() {}
+void Commands::writeLowestFreeRAM() {}
+#endif
