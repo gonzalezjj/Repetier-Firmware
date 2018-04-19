@@ -289,7 +289,11 @@ int HAL::getFreeRam() {
     uint8_t * heapptr, * stackptr;
     heapptr = (uint8_t *)malloc(4);          // get heap pointer
     free(heapptr);      // free up the memory again (sets heapptr to 0)
+#if RTOS_ENABLE
+    stackptr =  (uint8_t *)(RAMEND);           // save value of stack pointer
+#else
     stackptr =  (uint8_t *)(SP);           // save value of stack pointer
+#endif
     freeram = (int)stackptr - (int)heapptr;
     return freeram;
 }

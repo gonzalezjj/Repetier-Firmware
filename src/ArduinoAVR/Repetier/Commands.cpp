@@ -138,8 +138,10 @@ void Commands::waitUntilEndOfAllBuffers() {
 #endif
                 Commands::executeGCode(code);
             code->popCurrentCommand();
+#if RTOS_ENABLE
         } else {
             RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
         }
         Commands::checkForPeriodicalActions(false); // only called from memory
         UI_MEDIUM;
@@ -2962,8 +2964,6 @@ void Commands::emergencyStop() {
 #endif
 }
 
-#if RTOS_ENABLE == 0
-
 void Commands::checkFreeMemory() {
     int newfree = HAL::getFreeRam();
     if(newfree < lowestRAMValue)
@@ -2977,7 +2977,3 @@ void Commands::writeLowestFreeRAM() {
     }
 }
 
-#else
-void Commands::checkFreeMemory() {}
-void Commands::writeLowestFreeRAM() {}
-#endif
