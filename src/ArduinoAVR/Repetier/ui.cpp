@@ -2035,6 +2035,7 @@ void UIDisplay::refreshPage() {
     char *text;
 
     if(menuLevel == 0) { // Top level menu
+#if !KEEP_DEFAULT_MAIN_SCREEN_DURING_PRINT
         if(menuPos[0] == 0 && Printer::isPrinting()) {
 #if SDSUPPORT
             if(sd.sdactive && sd.sdmode) {
@@ -2074,7 +2075,9 @@ void UIDisplay::refreshPage() {
             }
         }
 //###RAyWB  Change Mainpage for CNC and Laser Mode
-        else if
+        else
+#endif
+            if
         (menuPos[0] == 0 && (Printer::mode != PRINTER_MODE_FFF)) {
 
             col = 0;
@@ -2216,8 +2219,9 @@ void UIDisplay::refreshPage() {
     char fanString[2];
 #endif // FAN_PIN > -1 && FEATURE_FAN_CONTROL
     if(menuLevel == 0 && menuPos[0] == 0 ) { // Main menu with special graphics
+#if !KEEP_DEFAULT_MAIN_SCREEN_DURING_PRINT
         if(!Printer::isPrinting()) {
-
+#endif
             if(Printer::mode == PRINTER_MODE_FFF) { //###RAy enabling symbols only in printer mode
 //ext1 and ext2 animation symbols
 #if NUM_EXTRUDER < 3
@@ -2267,13 +2271,16 @@ void UIDisplay::refreshPage() {
                 }
             }
 #endif // SDSUPPORT
+#if !KEEP_DEFAULT_MAIN_SCREEN_DURING_PRINT
         }
+#endif
     }
 #endif
     //u8g picture loop
     u8g_FirstPage(&u8g);
     do {
         if(menuLevel == 0 && menuPos[0] == 0 ) {
+#if !KEEP_DEFAULT_MAIN_SCREEN_DURING_PRINT
             if(Printer::isPrinting()) {
 #if defined(UI_HEAD)
                 // Show status line
@@ -2303,7 +2310,9 @@ void UIDisplay::refreshPage() {
                     printU8GRow(0, UI_FONT_HEIGHT * 6 + 2, cache[UI_ROWS - 1]);
 #endif
                 printRow(0, cache[0], NULL, UI_COLS); // Object name
-            } else { // not printing
+            } else
+#endif
+            { // not printing
                 u8g_SetFont(&u8g, UI_FONT_SMALL);
                 uint8_t py = 8;
                 for(uint8_t r = 0; r < 3; r++) {

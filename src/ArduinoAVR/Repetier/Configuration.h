@@ -1969,6 +1969,8 @@ If you have leveling with bed coating or fixed z min you can use this menu to ad
 // #define MOTOR_DRIVER_x StepperDriverWithEndstop<int stepPin, int dirPin, int enablePin,bool invertDir, bool invertEnable,int endstop_pin,bool minEndstop,minEndstop, bool endstopPullup> var(300,10,50)
 #define MOTOR_DRIVER_1(var) StepperDriver<E1_STEP_PIN, E1_DIR_PIN, E1_ENABLE_PIN, false, false> var(float stepsPerMM,float speed,float maxXPos)
 
+#define KEEP_DEFAULT_MAIN_SCREEN_DURING_PRINT 1
+
 /*
  * A real-time operating system allows separating the UI code from the printer
  * control code, improving the performance of the printer by reducing latency.
