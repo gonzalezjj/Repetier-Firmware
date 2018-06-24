@@ -1,5 +1,12 @@
 # Repetier-Firmware - the fast and user friendly firmware
 
+## About this fork
+
+This fork contains modifications **for AVR boards** (RAMPS, etc.) to make the firmware faster and more usable for power users
+
+* Added a real-time operating system (a custom port of FreeRTOS with support for nested interrupts) to separate GUI rendering and motion. This **greatly increases the maximum speed** of the printer, since slow GUI operations are preempted (i.e. interrupted and later resumed) when new movement computations are needed, instead of just waiting for the GUI to finish rendering
+* Modified the **main screen** and menu to behave more like in the pre 1.x version, showing **more information**
+
 ## Notes for developers/pull requests
 
 This software is open source licensed under the GPL V3. As any free project we
