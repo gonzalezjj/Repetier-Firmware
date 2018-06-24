@@ -133,7 +133,7 @@ is a full cartesian system where x, y and z moves are handled by separate motors
 Cases 1, 2, 8 and 9 cover all needed xy and xz H gantry systems. If you get results mirrored etc. you can swap motor connections for x and y.
 If a motor turns in the wrong direction change INVERT_X_DIR or INVERT_Y_DIR.
 */
-#define DRIVE_SYSTEM 0
+#define DRIVE_SYSTEM 1
 /*
   Normal core xy implementation needs 2 virtual steps for a motor step to guarantee
   that every tiny move gets maximum one step regardless of direction. This can cost
@@ -196,11 +196,11 @@ pins. Separate multiple GCODEs with \n
 /** \brief Number of steps for a 1mm move in x direction.
 For xy gantry use 2*belt moved!
 Overridden if EEPROM activated. */
-#define XAXIS_STEPS_PER_MM 100
+#define XAXIS_STEPS_PER_MM 200
 /** \brief Number of steps for a 1mm move in y direction.
 For xy gantry use 2*belt moved!
 Overridden if EEPROM activated.*/
-#define YAXIS_STEPS_PER_MM 100
+#define YAXIS_STEPS_PER_MM 200
 /** \brief Number of steps for a 1mm move in z direction  Overridden if EEPROM activated.*/
 #define ZAXIS_STEPS_PER_MM 400
 #endif
@@ -336,12 +336,12 @@ A good start is 30 lower then the optimal value. You need to leave room for cool
 */
 #define EXT0_PID_INTEGRAL_DRIVE_MIN 40
 /** P-gain.  Overridden if EEPROM activated. */
-#define EXT0_PID_PGAIN_OR_DEAD_TIME   7
+#define EXT0_PID_PGAIN_OR_DEAD_TIME   9
 /** I-gain. Overridden if EEPROM activated.
 */
-#define EXT0_PID_I   2
+#define EXT0_PID_I   0.67
 /** Dgain.  Overridden if EEPROM activated.*/
-#define EXT0_PID_D 40
+#define EXT0_PID_D 46
 // maximum time the heater is can be switched on. Max = 255.  Overridden if EEPROM activated.
 #define EXT0_PID_MAX 255
 /** \brief Faktor for the advance algorithm. 0 disables the algorithm.  Overridden if EEPROM activated.
@@ -852,20 +852,20 @@ on this endstop.
 #define ENDSTOP_PULLUP_Z_MAX true
 
 //set to true to invert the logic of the endstops
-#define ENDSTOP_X_MIN_INVERTING true
-#define ENDSTOP_Y_MIN_INVERTING true
-#define ENDSTOP_Z_MIN_INVERTING true
+#define ENDSTOP_X_MIN_INVERTING false
+#define ENDSTOP_Y_MIN_INVERTING false
+#define ENDSTOP_Z_MIN_INVERTING false
 #define ENDSTOP_X_MAX_INVERTING false
 #define ENDSTOP_Y_MAX_INVERTING false
 #define ENDSTOP_Z_MAX_INVERTING false
 
 // Set the values true where you have a hardware endstop. The Pin number is taken from pins.h.
 
-#define MIN_HARDWARE_ENDSTOP_X true
-#define MIN_HARDWARE_ENDSTOP_Y true
+#define MIN_HARDWARE_ENDSTOP_X false
+#define MIN_HARDWARE_ENDSTOP_Y false
 #define MIN_HARDWARE_ENDSTOP_Z true
-#define MAX_HARDWARE_ENDSTOP_X false
-#define MAX_HARDWARE_ENDSTOP_Y false
+#define MAX_HARDWARE_ENDSTOP_X true
+#define MAX_HARDWARE_ENDSTOP_Y true
 #define MAX_HARDWARE_ENDSTOP_Z false
 
 // If you have a mirrored motor you can put a second endstop to that motor.
@@ -930,21 +930,21 @@ on this endstop.
 
 //// ENDSTOP SETTINGS:
 // Sets direction of endstops when homing; 1=MAX, -1=MIN
-#define X_HOME_DIR -1
-#define Y_HOME_DIR -1
+#define X_HOME_DIR 1
+#define Y_HOME_DIR 1
 #define Z_HOME_DIR -1
 
 // Delta robot radius endstop
 #define max_software_endstop_r true
 
 //If true, axis won't move to coordinates less than zero.
-#define min_software_endstop_x false
-#define min_software_endstop_y false
-#define min_software_endstop_z false
+#define min_software_endstop_x true
+#define min_software_endstop_y true
+#define min_software_endstop_z true
 
 //If true, axis won't move to coordinates greater than the defined lengths below.
-#define max_software_endstop_x true
-#define max_software_endstop_y true
+#define max_software_endstop_x false
+#define max_software_endstop_y false
 #define max_software_endstop_z true
 
 // If during homing the endstop is reached, ho many mm should the printer move back for the second try
@@ -956,12 +956,12 @@ on this endstop.
 // during homing operation. The homing speed is divided by the value. 1 = same speed, 2 = half speed
 #define ENDSTOP_X_RETEST_REDUCTION_FACTOR 3
 #define ENDSTOP_Y_RETEST_REDUCTION_FACTOR 3
-#define ENDSTOP_Z_RETEST_REDUCTION_FACTOR 3
+#define ENDSTOP_Z_RETEST_REDUCTION_FACTOR 6
 
 // When you have several endstops in one circuit you need to disable it after homing by moving a
 // small amount back. This is also the case with H-belt systems.
-#define ENDSTOP_X_BACK_ON_HOME 1
-#define ENDSTOP_Y_BACK_ON_HOME 1
+#define ENDSTOP_X_BACK_ON_HOME 0
+#define ENDSTOP_Y_BACK_ON_HOME 0
 #define ENDSTOP_Z_BACK_ON_HOME 0
 // If you do z min homing, you might want to rise extruder a bit after homing so it does not heat
 // touching your bed.
@@ -975,13 +975,13 @@ on this endstop.
 // For delta robot Z_MAX_LENGTH is the maximum travel of the towers and should be set to the distance between the hotend
 // and the platform when the printer is at its home position.
 // If EEPROM is enabled these values will be overridden with the values in the EEPROM
-#define X_MAX_LENGTH 250
-#define Y_MAX_LENGTH 223
-#define Z_MAX_LENGTH 240
+#define X_MAX_LENGTH 228
+#define Y_MAX_LENGTH 226
+#define Z_MAX_LENGTH 190
 // Coordinates for the minimum axis. Can also be negative if you want to have the bed start at 0 and the printer can go to the left side
 // of the bed. Maximum coordinate is given by adding the above X_MAX_LENGTH values.
-#define X_MIN_POS -40
-#define Y_MIN_POS -20
+#define X_MIN_POS -10
+#define Y_MIN_POS -9
 #define Z_MIN_POS 0
 
 // ##########################################################################################
@@ -1126,12 +1126,12 @@ Mega. Used only for nonlinear systems like delta or tuga. */
     */
 #define MAX_FEEDRATE_X 300
 #define MAX_FEEDRATE_Y 300
-#define MAX_FEEDRATE_Z 30
+#define MAX_FEEDRATE_Z 40
 
 /** Home position speed in mm/s. Overridden if EEPROM activated. */
 #define HOMING_FEEDRATE_X 40
 #define HOMING_FEEDRATE_Y 40
-#define HOMING_FEEDRATE_Z 10
+#define HOMING_FEEDRATE_Z 8
 
 /** Set order of axis homing. Use HOME_ORDER_XYZ and replace XYZ with your order. 
  * If you measure Z with your extruder tip you need a hot extruder to get right measurement. In this
@@ -1139,7 +1139,7 @@ Mega. Used only for nonlinear systems like delta or tuga. */
  * first a z home to get some reference, then raise to ZHOME_HEAT_HEIGHT do xy homing and then after
  * heating to minimum ZHOME_MIN_TEMPERATURE will z home again for correct height.   
  * */
-#define HOMING_ORDER HOME_ORDER_XYZ
+#define HOMING_ORDER HOME_ORDER_XYTZ
 /*
   Raise Z before homing z axis
   0 = no
@@ -1162,15 +1162,17 @@ Mega. Used only for nonlinear systems like delta or tuga. */
 // Used for homing order HOME_ORDER_ZXYTZ
 #define ZHOME_MIN_TEMPERATURE 0
 // needs to heat all extruders (1) or only current extruder (0)
-#define ZHOME_HEAT_ALL 1 
+#define ZHOME_HEAT_ALL 0
 // Z-height for heating extruder during homing
-#define ZHOME_HEAT_HEIGHT 20
+#define ZHOME_HEAT_HEIGHT 0
 // If your bed might bend while probing, because your sensor is the extruder tip
 // you can define a predefined x,y position so bending is always the same and
 // can be compensated. Set coordinate to 999999 to ignore positions and just
 // use the position you are at.
-#define ZHOME_X_POS IGNORE_COORDINATE
-#define ZHOME_Y_POS IGNORE_COORDINATE
+//#define ZHOME_X_POS IGNORE_COORDINATE
+//#define ZHOME_Y_POS IGNORE_COORDINATE
+#define ZHOME_X_POS 107
+#define ZHOME_Y_POS 107
 
 /* If you have a backlash in both z-directions, you can use this. For most printer, the bed will be pushed down by it's
 own weight, so this is nearly never needed. */
@@ -1268,14 +1270,14 @@ Corner can be printed with full speed of 50 mm/s
 Overridden if EEPROM activated.
 */
 #define MAX_JERK 15.0
-#define MAX_ZJERK 0.0
+#define MAX_ZJERK 1.0
 
 /** \brief Number of moves we can cache in advance.
 
 This number of moves can be cached in advance. If you want to cache more, increase this. Especially on
 many very short moves the cache may go empty. The minimum value is 5.
 */
-#define PRINTLINE_CACHE_SIZE 20
+#define PRINTLINE_CACHE_SIZE 23
 
 /** \brief Low filled cache size.
 
@@ -1346,7 +1348,7 @@ to activate the quadratic term. Only adds lots of computations and storage usage
 Some boards like Gen7 have a power on pin, to enable the ATX power supply. If this is defined,
 the power will be turned on without the need to call M80 if initially started.
 */
-#define ENABLE_POWER_ON_STARTUP 1
+#define ENABLE_POWER_ON_STARTUP 0
 
 /**
 If you use an ATX power supply you need the power pin to work non inverting. For some special
@@ -1356,7 +1358,7 @@ boards you might need to make it inverting.
 
 /** Automatically enable power when temperatures or moves/homing is used. Set only to 1 if
  *you have a power unit controlled by PS_ON_PIN! */
-#define AUTOMATIC_POWERUP 1
+#define AUTOMATIC_POWERUP 0
 
 /** What shall the printer do, when it receives an M112 emergency stop signal?
  0 = Disable heaters/motors, wait forever until someone presses reset.
@@ -1393,7 +1395,7 @@ matches, the stored values are used to overwrite the settings.
 IMPORTANT: With mode <>0 some changes in Configuration.h are not set any more, as they are
            taken from the EEPROM.
 */
-#define EEPROM_MODE 101
+#define EEPROM_MODE 102
 
 
 /**************** duplicate motor driver ***************
@@ -1559,32 +1561,32 @@ to recalibrate z.
  That way the real bed is always the reference height. For inductive sensors
  or z min endstops the coating has no effect on the result, so you should use mode 0.
 */
-#define Z_PROBE_Z_OFFSET_MODE 0
+#define Z_PROBE_Z_OFFSET_MODE 1
 
-#define FEATURE_Z_PROBE 0
+#define FEATURE_Z_PROBE 1
 // Especially if you have more then 1 extruder acting as z probe this is important!
 #define EXTRUDER_IS_Z_PROBE 0
 // Disable all heaters before probing - required for inductive sensors
 #define Z_PROBE_DISABLE_HEATERS 0
-#define Z_PROBE_PIN 63
+#define Z_PROBE_PIN Z_MIN_PIN
 #define Z_PROBE_PULLUP 1
-#define Z_PROBE_ON_HIGH 1
+#define Z_PROBE_ON_HIGH 0
 #define Z_PROBE_X_OFFSET 0
-#define Z_PROBE_Y_OFFSET 0
-#define Z_PROBE_BED_DISTANCE 5.0 // Higher than max bed level distance error in mm
+#define Z_PROBE_Y_OFFSET 55
+#define Z_PROBE_BED_DISTANCE 8 // Higher than max bed level distance error in mm
 
 // Waits for a signal to start. Valid signals are probe hit and ok button.
 // This is needful if you have the probe trigger by hand.
 #define Z_PROBE_WAIT_BEFORE_TEST 0
 /** Speed of z-axis in mm/s when probing */
-#define Z_PROBE_SPEED 2
+#define Z_PROBE_SPEED 4
 /** Delay before going down. Needed for piezo endstops to reload safely. */
 #define Z_PROBE_DELAY 0
-#define Z_PROBE_XY_SPEED 150
+#define Z_PROBE_XY_SPEED 200
 #define Z_PROBE_SWITCHING_DISTANCE 1.5 // Distance to safely switch off probe after it was activated
 #define Z_PROBE_REPETITIONS 5 // Repetitions for probing at one point.
 /** Distance between nozzle and bed when probe triggers. */
-#define Z_PROBE_HEIGHT 39.91
+#define Z_PROBE_HEIGHT 1.05
 /** These scripts are run before resp. after the z-probe is done. Add here code to activate/deactivate probe if needed. */
 #define Z_PROBE_START_SCRIPT ""
 #define Z_PROBE_FINISHED_SCRIPT ""
@@ -1615,14 +1617,14 @@ bending to both sides of the axis. So probe points 2 and 3 build the symmetric a
 point 1 is mirrored to 1m across the axis. Using the symmetry we then remove the bending
 from 1 and use that as plane.
 */
-#define BED_LEVELING_METHOD 0
+#define BED_LEVELING_METHOD 1
 /* How to correct rotation.
 0 = software side
 1 = motorized modification of 2 from 3 fixture points.
 */
 #define BED_CORRECTION_METHOD 0
 // Grid size for grid based plane measurement
-#define BED_LEVELING_GRID_SIZE 4
+#define BED_LEVELING_GRID_SIZE 3
 // Repetitions for motorized bed leveling
 #define BED_LEVELING_REPETITIONS 5
 /* These are the motor positions relative to bed origin. Only needed for
@@ -1638,13 +1640,25 @@ motorized bed leveling */
    This feature requires a working z-probe and you should have z-endstop at the top not at the bottom.
    The same 3 points are used for the G29 command.
 */
-#define FEATURE_AUTOLEVEL 0
-#define Z_PROBE_X1 100
-#define Z_PROBE_Y1 20
-#define Z_PROBE_X2 160
-#define Z_PROBE_Y2 170
-#define Z_PROBE_X3 20
-#define Z_PROBE_Y3 170
+#define FEATURE_AUTOLEVEL 1
+//#define Z_PROBE_X1 107
+//#define Z_PROBE_Y1 50
+//#define Z_PROBE_X2 190
+//#define Z_PROBE_Y2 190
+//#define Z_PROBE_X3 20
+//#define Z_PROBE_Y3 190
+//#define Z_PROBE_X1 20
+//#define Z_PROBE_Y1 50
+//#define Z_PROBE_X2 190
+//#define Z_PROBE_Y2 50
+//#define Z_PROBE_X3 20
+//#define Z_PROBE_Y3 190
+#define Z_PROBE_X1 30
+#define Z_PROBE_Y1 50
+#define Z_PROBE_X2 180
+#define Z_PROBE_Y2 50
+#define Z_PROBE_X3 30
+#define Z_PROBE_Y3 180
 /* Bending correction adds a value to a measured z-probe value. This may be
   required when the z probe needs some force to trigger and this bends the
   bed down. Currently the correction values A/B/C correspond to z probe
