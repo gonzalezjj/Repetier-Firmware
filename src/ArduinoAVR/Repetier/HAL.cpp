@@ -1,6 +1,12 @@
 #include "Repetier.h"
 #include <compat/twi.h>
 
+#if RTOS_ENABLE
+#define LONG_ISR(_vec_name_) portRTOS_ISR(_vec_name_)
+#else
+#define LONG_ISR(_vec_name_) ISR(_vec_name_)
+#endif
+
 #if ANALOG_INPUTS > 0
 uint8 osAnalogInputCounter[ANALOG_INPUTS];
 uint osAnalogInputBuildup[ANALOG_INPUTS];
@@ -283,15 +289,19 @@ int HAL::getFreeRam() {
     uint8_t * heapptr, * stackptr;
     heapptr = (uint8_t *)malloc(4);          // get heap pointer
     free(heapptr);      // free up the memory again (sets heapptr to 0)
+#if RTOS_ENABLE
+    stackptr =  (uint8_t *)(RAMEND);           // save value of stack pointer
+#else
     stackptr =  (uint8_t *)(SP);           // save value of stack pointer
+#endif
     freeram = (int)stackptr - (int)heapptr;
     return freeram;
 }
 
-void(* resetFunc) (void) = 0; //declare reset function @ address 0
-
 void HAL::resetHardware() {
-    resetFunc();
+    forbidInterrupts();
+    wdt_enable(WDTO_15MS);
+    while(1);
 }
 
 void HAL::analogStart() {
@@ -640,9 +650,10 @@ inline void setTimer(uint32_t delay) {
 }
 
 // volatile uint8_t insideTimer1 = 0;
+
 /** \brief Timer interrupt routine to drive the stepper motors.
 */
-ISR(TIMER1_COMPA_vect) {
+LONG_ISR(TIMER1_COMPA_vect) {
     // if(insideTimer1) return;
     uint8_t doExit;
     __asm__ __volatile__ (
@@ -763,10 +774,11 @@ ISR(TIMER1_COMPA_vect) {
 #endif
 
 #define pulseDensityModulate( pin, density,error,invert) {uint8_t carry;carry = error + (invert ? 255 - density : density); WRITE(pin, (carry < error)); error = carry;}
+
 /**
 This timer is called 3906 timer per second. It is used to update pwm values for heater and some other frequent jobs.
 */
-ISR(PWM_TIMER_VECTOR) {
+LONG_ISR(PWM_TIMER_VECTOR) {
     static uint8_t pwm_count_cooler = 0;
     static uint8_t pwm_count_heater = 0;
     static uint8_t pwm_pos_set[NUM_PWM];
@@ -978,6 +990,9 @@ ISR(PWM_TIMER_VECTOR) {
     if(counterPeriodical >= (int)(F_CPU / 40960)) {
         counterPeriodical = 0;
         executePeriodical = 1;
+#if RTOS_ENABLE
+        RTOS::notify(RTOS::NOTIFY_PERIODIC_ACTION_REQUIRED);
+#endif
 #if FEATURE_FAN_CONTROL
         if (fanKickstart) fanKickstart--;
 #endif

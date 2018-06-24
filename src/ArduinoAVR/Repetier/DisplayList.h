@@ -1777,24 +1777,29 @@ inline void uiCheckSlowKeys(uint16_t &action) {}
 #endif
 #endif
 
+#if RTOS_ENABLE
+#define UI_REFRESH RTOS::notify(RTOS::NOTIFY_SCREEN_UPDATE_NEEDED);
+#else
+#define UI_REFRESH uid.refreshPage();
+#endif
 #define UI_INITIALIZE uid.initialize();
 #define UI_FAST if((counterPeriodical & 3) == 3) {uid.fastAction();}
 #define UI_MEDIUM uid.mediumAction();
 #define UI_SLOW(allowMoves) uid.slowAction(allowMoves);
 #define UI_STATUS(status) uid.setStatusP(PSTR(status));
 #define UI_STATUS_F(status) uid.setStatusP(status);
-#define UI_STATUS_UPD(status) {uid.setStatusP(PSTR(status));uid.refreshPage();}
-#define UI_STATUS_UPD_F(status) {uid.setStatusP(status);uid.refreshPage();}
+#define UI_STATUS_UPD(status) {uid.setStatusP(PSTR(status));UI_REFRESH;}
+#define UI_STATUS_UPD_F(status) {uid.setStatusP(status);UI_REFRESH;}
 #define UI_STATUS_RAM(status) uid.setStatus(status);
-#define UI_STATUS_UPD_RAM(status) {uid.setStatus(status);uid.refreshPage();}
+#define UI_STATUS_UPD_RAM(status) {uid.setStatus(status);UI_REFRESH;}
 #define UI_ERROR(status) uid.setStatusP(PSTR(status),true);
 #define UI_ERROR_P(status) uid.setStatusP(status,true);
-#define UI_ERROR_UPD(status) {uid.setStatusP(PSTR(status),true);uid.refreshPage();}
+#define UI_ERROR_UPD(status) {uid.setStatusP(PSTR(status),true);UI_REFRESH;}
 #define UI_ERROR_RAM(status) uid.setStatus(status,true);
-#define UI_ERROR_UPD_RAM(status) {uid.setStatus(status,true);uid.refreshPage();}
+#define UI_ERROR_UPD_RAM(status) {uid.setStatus(status,true);UI_REFRESH;}
 //#define UI_ERROR(msg) {uid.errorMsg=(void*)PSTR(msg);pushMenu((void*)&ui_menu_error,true);}
 #define UI_CLEAR_STATUS {uid.statusMsg[0]=0;}
-#define UI_RESET_MENU {uid.menuLevel=0;uid.refreshPage();}
+#define UI_RESET_MENU {uid.menuLevel=0;UI_REFRESH;}
 #define UI_MESSAGE(menu) {uid.showMessage(menu);}
 #define UI_ACTION(ac) {uid.executeAction(ac,true);}
 #else

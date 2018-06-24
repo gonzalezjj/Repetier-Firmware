@@ -365,6 +365,9 @@ void TemperatureController::waitForTargetTemperature() {
             time = HAL::timeInMilliseconds();
         }*/
         Commands::checkForPeriodicalActions(true);
+#if RTOS_ENABLE
+        RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
         GCode::keepAlive(WaitHeater);
         if(fabs(targetTemperatureC - currentTemperatureC) <= 1) {
             Printer::setAutoreportTemp(oldReport);
@@ -955,6 +958,9 @@ void Extruder::setTemperatureForExtruder(float temperatureInCelsius, uint8_t ext
                 printedTime = currentTime;
             }*/
             Commands::checkForPeriodicalActions(true);
+#if RTOS_ENABLE
+            RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
             GCode::keepAlive(WaitHeater);
             //gcode_read_serial();
 #if RETRACT_DURING_HEATUP
@@ -2495,6 +2501,9 @@ void TemperatureController::autotunePID(float temp, uint8_t controllerId, int ma
             }
             return;
         }
+#if RTOS_ENABLE
+        RTOS::wait(RTOS_MAIN_THREAD_SLEEP_MS);
+#endif
         UI_MEDIUM;
         UI_SLOW(true);
     } // loop
